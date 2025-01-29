@@ -3,10 +3,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
-  outputs = {
-    nixpkgs,
-    ...
-  }: let
+  outputs = {nixpkgs, ...}: let
     inherit (nixpkgs) lib;
     eachSystem = lib.genAttrs [
       "aarch64-darwin"
