@@ -98,7 +98,7 @@ in {
         {
           LISTEN_ADDR = "[::1]:${toString cfg.port}";
         }
-        (lib.optionalAttrs cfg.configureDatabase {DB_URL = "postgresql:///${cfg.user}?host=/run/postgresql";})
+        // (lib.optionalAttrs cfg.configureDatabase {DB_URL = "postgresql:///${cfg.user}?host=/run/postgresql";})
         // cfg.settings;
 
       serviceConfig = {
