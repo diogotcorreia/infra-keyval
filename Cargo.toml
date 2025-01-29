@@ -1,0 +1,10 @@
+[package]
+name = "infra-keyval"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = { version = "0.8.1", features = ["http1", "tokio"], default-features = false }
+keyv = { version = "0.2.1", features = ["postgres"] }
+serde_json = "1.0.138"
+tokio = "1.43.0"
