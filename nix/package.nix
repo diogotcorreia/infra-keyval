@@ -4,7 +4,7 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "infra-keyval";
-  version = "0.1.0";
+  version = "0.1.1";
 
   src = ../.;
   cargoLock.lockFile = ../Cargo.lock;
