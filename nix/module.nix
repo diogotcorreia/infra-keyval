@@ -3,12 +3,20 @@
   pkgs,
   lib,
   ...
-}: let
-  inherit (lib) types mkEnableOption mkOption mkIf literalExpression;
+}:
+let
+  inherit (lib)
+    types
+    mkEnableOption
+    mkOption
+    mkIf
+    literalExpression
+    ;
   cfg = config.services.infra-keyval;
 
-  package = pkgs.callPackage ./package.nix {};
-in {
+  package = pkgs.callPackage ./package.nix { };
+in
+{
   options = {
     services.infra-keyval = {
       enable = mkEnableOption (lib.mdDoc "infra-keyval");
@@ -22,8 +30,7 @@ in {
       user = mkOption {
         type = types.str;
         default = "infra-keyval";
-        description =
-          lib.mdDoc "User account under which infra-keyval runs.";
+        description = lib.mdDoc "User account under which infra-keyval runs.";
       };
 
       group = mkOption {
@@ -45,7 +52,7 @@ in {
 
       settings = mkOption {
         type = types.attrsOf types.anything;
-        default = {};
+        default = { };
         description = lib.mdDoc ''
           Structural infra-keyval configuration.
           Refer to upstream's documentation for details and supported values.
@@ -79,7 +86,7 @@ in {
   config = mkIf cfg.enable {
     services.postgresql = mkIf cfg.configureDatabase {
       enable = true;
-      ensureDatabases = [cfg.user];
+      ensureDatabases = [ cfg.user ];
       ensureUsers = [
         {
           name = cfg.user;
@@ -91,16 +98,17 @@ in {
 
     systemd.services.infra-keyval = {
       description = "infra-keyval";
-      after = ["network.target"] ++ lib.optionals cfg.configureDatabase ["postgresql.target"];
-      requires = lib.optionals cfg.configureDatabase ["postgresql.target"];
-      wantedBy = ["multi-user.target"];
+      after = [ "network.target" ] ++ lib.optionals cfg.configureDatabase [ "postgresql.target" ];
+      requires = lib.optionals cfg.configureDatabase [ "postgresql.target" ];
+      wantedBy = [ "multi-user.target" ];
 
-      environment =
-        {
-          LISTEN_ADDR = "[::1]:${toString cfg.port}";
-        }
-        // (lib.optionalAttrs cfg.configureDatabase {DB_URL = "postgresql:///${cfg.user}?host=/run/postgresql";})
-        // cfg.settings;
+      environment = {
+        LISTEN_ADDR = "[::1]:${toString cfg.port}";
+      }
+      // (lib.optionalAttrs cfg.configureDatabase {
+        DB_URL = "postgresql:///${cfg.user}?host=/run/postgresql";
+      })
+      // cfg.settings;
 
       serviceConfig = {
         Type = "simple";
@@ -108,12 +116,16 @@ in {
         Group = cfg.group;
         ExecStart = "${lib.getExe cfg.package}";
         Restart = "on-failure";
-        EnvironmentFile = [cfg.settingsFile];
+        EnvironmentFile = [ cfg.settingsFile ];
 
         # systemd hardening
         NoNewPrivileges = true;
         SystemCallArchitectures = "native";
-        RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6"];
+        RestrictAddressFamilies = [
+          "AF_UNIX"
+          "AF_INET"
+          "AF_INET6"
+        ];
         RestrictNamespaces = !config.boot.isContainer;
         RestrictRealtime = true;
         RestrictSUIDSGID = true;
@@ -157,7 +169,7 @@ in {
     };
 
     users.groups = mkIf (cfg.group == "infra-keyval") {
-      infra-keyval = {};
+      infra-keyval = { };
     };
   };
 }
