@@ -91,8 +91,8 @@ in {
 
     systemd.services.infra-keyval = {
       description = "infra-keyval";
-      after = ["network.target"];
-      requires = lib.optionals cfg.configureDatabase ["postgresql.service"];
+      after = ["network.target"] ++ lib.optionals cfg.configureDatabase ["postgresql.target"];
+      requires = lib.optionals cfg.configureDatabase ["postgresql.target"];
       wantedBy = ["multi-user.target"];
 
       environment =
